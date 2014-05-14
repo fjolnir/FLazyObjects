@@ -74,7 +74,8 @@
 }
 - (void)removeObjectAtIndex:(NSUInteger)aIdx
 {
-    [_resolvedIndexes shiftIndexesStartingAtIndex:aIdx by:-1];
+    [_resolvedIndexes removeIndex:aIdx];
+    [_resolvedIndexes shiftIndexesStartingAtIndex:aIdx+1 by:-1];
     [_array removePointerAtIndex:aIdx];
 }
 
