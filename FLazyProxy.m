@@ -19,7 +19,7 @@
 
 - (id)_cy_object
 {
-    if(!_resolved) {
+    if(__builtin_expect(!_resolved, 0)) {
         _resolved = YES;
         _object = _resolver();
     }

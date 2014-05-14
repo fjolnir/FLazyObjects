@@ -42,7 +42,7 @@
 - (id)objectAtIndex:(NSUInteger const)aIdx
 {
     id object = (id)[_array pointerAtIndex:aIdx];
-    if(!object) {
+    if(__builtin_expect(!object, 0)) {
         object = [FLazyProxy proxyWithBlock:^{
             [self _resolveIndex:aIdx];
             return (id)[_array pointerAtIndex:aIdx];
