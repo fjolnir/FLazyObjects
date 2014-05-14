@@ -37,5 +37,9 @@
     return [[self _cy_object] methodSignatureForSelector:aSelector];
 }
 
+- (id)self
+{
+    return [self _cy_object];
+}
 @end
 
