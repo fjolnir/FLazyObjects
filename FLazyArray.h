@@ -7,7 +7,7 @@ typedef id (^FLazyArrayResolver)(NSUInteger aIdx);
 @interface FLazyArray : NSObject
 @property(readonly) NSUInteger count;
 
-+ (FLazyArray *)arrayWithCount:(NSUInteger)aCount resolver:(FLazyArrayResolver)aResolver;
++ (instancetype)arrayWithCount:(NSUInteger)aCount resolver:(FLazyArrayResolver)aResolver;
 - (id)objectAtIndex:(NSUInteger)aIdx;
 - (id)objectAtIndexedSubscript:(NSUInteger)aIdx;
 

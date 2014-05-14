@@ -12,7 +12,7 @@
 @implementation FLazyArray
 @dynamic count;
 
-+ (FLazyArray *)arrayWithCount:(NSUInteger const)aCount resolver:(FLazyArrayResolver const)aResolver
++ (instancetype)arrayWithCount:(NSUInteger const)aCount resolver:(FLazyArrayResolver const)aResolver
 {
     FLazyArray * const array = [self new];
     array->_resolver    = aResolver;
