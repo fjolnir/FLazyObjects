@@ -65,6 +65,13 @@
     [_resolvedIndexes removeIndex:aIdx];
     [_array replacePointerAtIndex:aIdx withPointer:NULL];
 }
+- (void)forgetAllObjects
+{
+    [_resolvedIndexes removeAllIndexes];
+    NSUInteger const count = [self count];
+    _array.count = 0;
+    _array.count = count;
+}
 
 - (void)insertObjectAtIndex:(NSUInteger const)aIdx
 {
