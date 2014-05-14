@@ -54,6 +54,14 @@
 {
     return [self objectAtIndex:aIdx];
 }
+- (NSArray *)objectsInRange:(NSRange const)aRange
+{
+    NSMutableArray * const array = [NSMutableArray new];
+    for(NSUInteger i = aRange.location; i < NSMaxRange(aRange); ++i) {
+        [array addObject:self[i]];
+    }
+    return array;
+}
 
 - (NSUInteger)count
 {

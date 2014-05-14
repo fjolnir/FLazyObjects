@@ -3,13 +3,14 @@
 // Cannot return nil.
 typedef id (^FLazyArrayResolver)(NSUInteger aIdx);
 
-// Warning: In no way thread safe.
+// Warning: In no way thread safe. (Nor are any derived collections)
 @interface FLazyArray : NSObject
 @property(readonly) NSUInteger count;
 
 + (instancetype)arrayWithCount:(NSUInteger)aCount resolver:(FLazyArrayResolver)aResolver;
 - (id)objectAtIndex:(NSUInteger)aIdx;
 - (id)objectAtIndexedSubscript:(NSUInteger)aIdx;
+- (NSArray *)objectsInRange:(NSRange)aRange;
 
 // Require an object to be resolved again
 - (void)forgetObjectAtIndex:(NSUInteger)aIdx;
