@@ -28,25 +28,31 @@
     return self;
 }
 
-- (void)_resolveIndex:(NSUInteger const)aIdx
+- (id)_resolveIndex:(NSUInteger const)aIdx
 {
     if(![_resolvedIndexes containsIndex:aIdx]) {
         id const object = _resolver(aIdx);
         NSAssert(object, @"Tried to insert nil into array!");
         [_array replacePointerAtIndex:aIdx withPointer:(__bridge void*)object];
         [_resolvedIndexes addIndex:aIdx];
-    }
+
+        return object;
+    } else
+        return [_array pointerAtIndex:aIdx];
 }
 
 - (id)objectAtIndex:(NSUInteger const)aIdx
 {
     id object = (id)[_array pointerAtIndex:aIdx];
     if(__builtin_expect(!object, 0)) {
-        object = [FLazyProxy proxyWithBlock:^{
-            [self _resolveIndex:aIdx];
-            return (id)[_array pointerAtIndex:aIdx];
-        }];
-        [_array replacePointerAtIndex:aIdx withPointer:(__bridge void*)object];
+        if(_useProxies) {
+            object = [FLazyProxy proxyWithBlock:^{
+                [self _resolveIndex:aIdx];
+                return (id)[_array pointerAtIndex:aIdx];
+            }];
+            [_array replacePointerAtIndex:aIdx withPointer:(__bridge void*)object];
+        } else
+            object = [self _resolveIndex:aIdx];
     }
     return object;
 }

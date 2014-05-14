@@ -6,6 +6,7 @@ typedef id (^FLazyArrayResolver)(NSUInteger aIdx);
 // Warning: In no way thread safe. (Nor are any derived collections)
 @interface FLazyArray : NSObject
 @property(readonly) NSUInteger count;
+@property BOOL useProxies;
 
 + (instancetype)arrayWithCount:(NSUInteger)aCount resolver:(FLazyArrayResolver)aResolver;
 - (id)objectAtIndex:(NSUInteger)aIdx;
