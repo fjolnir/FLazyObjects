@@ -36,4 +36,6 @@
 {
     return [[self _cy_object] methodSignatureForSelector:aSelector];
 }
+
 @end
+

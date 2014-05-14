@@ -17,3 +17,4 @@ typedef id (^FLazyArrayResolver)(NSUInteger aIdx);
 - (void)insertObjectAtIndex:(NSUInteger)aIdx;
 - (void)removeObjectAtIndex:(NSUInteger)aIdx;
 @end
+
