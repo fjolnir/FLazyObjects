@@ -30,13 +30,12 @@
 
 - (void)_resolveIndex:(NSUInteger const)aIdx
 {
-    if([_resolvedIndexes containsIndex:aIdx])
-        return;
-
-    id const object = _resolver(aIdx);
-    NSAssert(object, @"Tried to insert nil into array!");
-    [_array replacePointerAtIndex:aIdx withPointer:(__bridge void*)object];
-    [_resolvedIndexes addIndex:aIdx];
+    if(![_resolvedIndexes containsIndex:aIdx]) {
+        id const object = _resolver(aIdx);
+        NSAssert(object, @"Tried to insert nil into array!");
+        [_array replacePointerAtIndex:aIdx withPointer:(__bridge void*)object];
+        [_resolvedIndexes addIndex:aIdx];
+    }
 }
 
 - (id)objectAtIndex:(NSUInteger const)aIdx
