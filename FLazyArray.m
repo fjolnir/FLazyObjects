@@ -79,6 +79,13 @@
     [_resolvedIndexes removeIndex:aIdx];
     [_array replacePointerAtIndex:aIdx withPointer:NULL];
 }
+- (void)forgetObjectsInRange:(NSRange const)aRange
+{
+    [_resolvedIndexes removeIndexesInRange:aRange];
+    for(NSUInteger i = aRange.location; i < NSMaxRange(aRange); ++i) {
+        [_array replacePointerAtIndex:i withPointer:NULL];
+    }
+}
 - (void)forgetAllObjects
 {
     [_resolvedIndexes removeAllIndexes];

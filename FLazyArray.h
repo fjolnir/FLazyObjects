@@ -15,6 +15,7 @@ typedef id (^FLazyArrayResolver)(NSUInteger aIdx);
 
 // Require an object to be resolved again
 - (void)forgetObjectAtIndex:(NSUInteger)aIdx;
+- (void)forgetObjectsInRange:(NSRange)aRange;
 - (void)forgetAllObjects;
 
 // Tell the array that the underlying datasource has inserted/deleted an item
