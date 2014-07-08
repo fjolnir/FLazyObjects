@@ -21,7 +21,7 @@
     return array;
 }
 
-- (id)init
+- (instancetype)init
 {
     if((self = [super init]))
         _resolvedIndexes = [NSMutableIndexSet new];
