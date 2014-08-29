@@ -68,6 +68,14 @@
     }
     return array;
 }
+- (NSArray *)objectsAtIndexes:(NSIndexSet * const)aIndexes
+{
+    NSMutableArray * const array = [NSMutableArray new];
+    [aIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [array addObject:self[idx]];
+    }];
+    return array;
+}
 
 - (NSUInteger)count
 {
@@ -86,6 +94,14 @@
         [_array replacePointerAtIndex:i withPointer:NULL];
     }
 }
+- (void)forgetObjectsAtIndexes:(NSIndexSet * const)aIndexes
+{
+    [_resolvedIndexes removeIndexes:aIndexes];
+    [aIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [_array replacePointerAtIndex:idx withPointer:NULL];
+    }];
+}
+
 - (void)forgetAllObjects
 {
     [_resolvedIndexes removeAllIndexes];
@@ -104,6 +120,15 @@
     [_resolvedIndexes removeIndex:aIdx];
     [_resolvedIndexes shiftIndexesStartingAtIndex:aIdx+1 by:-1];
     [_array removePointerAtIndex:aIdx];
+}
+- (void)removeObjectsAtAtIndexes:(NSIndexSet *)aIndexes
+{
+    [_resolvedIndexes removeIndexes:aIndexes];
+    [aIndexes enumerateIndexesWithOptions:NSEnumerationReverse
+                               usingBlock:^(NSUInteger idx, BOOL *stop) {
+        [_resolvedIndexes shiftIndexesStartingAtIndex:idx+1 by:-1];
+        [_array removePointerAtIndex:idx];
+    }];
 }
 
 
