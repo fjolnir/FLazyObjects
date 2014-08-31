@@ -29,7 +29,20 @@
 
 - (void)_resolveIndexes:(NSIndexSet * const)aIndexes
 {
-    NSIndexSet * const unresolvedIndexes = [aIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *_) {
+    NSIndexSet *indexes = aIndexes;
+    if([indexes count] < _batchSize) {
+        indexes = [aIndexes mutableCopy];
+        NSRange const validRange = { 0, [self count] };
+        [aIndexes enumerateIndexesWithOptions:NSEnumerationReverse
+                                   usingBlock:^(NSUInteger idx, BOOL *stop) {
+            [(id)indexes addIndexesInRange:NSIntersectionRange(validRange,
+                                                               (NSRange) { idx, _batchSize - [indexes count] })];
+            if([indexes count] >= _batchSize)
+                *stop = YES;
+        }];
+    }
+
+    NSIndexSet * const unresolvedIndexes = [indexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *_) {
         return ![_resolvedIndexes containsIndex:idx];
     }];
     if([unresolvedIndexes count] == 0)
