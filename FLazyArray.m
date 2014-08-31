@@ -1,5 +1,4 @@
 #import "FLazyArray.h"
-#import "FLazyProxy.h"
 #import <objc/runtime.h>
 
 @interface FLazyArray () {
@@ -28,53 +27,53 @@
     return self;
 }
 
-- (id)_resolveIndex:(NSUInteger const)aIdx
+- (void)_resolveIndexes:(NSIndexSet * const)aIndexes
 {
-    if(![_resolvedIndexes containsIndex:aIdx]) {
-        id const object = _resolver(aIdx);
-        NSAssert(object, @"Tried to insert nil into array!");
-        [_array replacePointerAtIndex:aIdx withPointer:(__bridge void*)object];
-        [_resolvedIndexes addIndex:aIdx];
+    NSIndexSet * const unresolvedIndexes = [aIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *_) {
+        return ![_resolvedIndexes containsIndex:idx];
+    }];
+    if([unresolvedIndexes count] == 0)
+        return;
 
-        return object;
-    } else
-        return [_array pointerAtIndex:aIdx];
+    __strong id * const newlyResolved = (__strong id *)calloc([unresolvedIndexes count], sizeof(id));
+    _resolver(unresolvedIndexes, newlyResolved);
+
+    __block __strong id *head = newlyResolved;
+    [unresolvedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [_array replacePointerAtIndex:idx withPointer:(__bridge void *)*head++];
+    }];
+    [_resolvedIndexes addIndexes:unresolvedIndexes];
+    free(newlyResolved);
 }
 
 - (id)objectAtIndex:(NSUInteger const)aIdx
 {
     id object = (id)[_array pointerAtIndex:aIdx];
-    if(__builtin_expect(!object, 0)) {
-        if(_useProxies) {
-            object = [FLazyProxy proxyWithBlock:^{
-                [self _resolveIndex:aIdx];
-                return (id)[_array pointerAtIndex:aIdx];
-            }];
-            [_array replacePointerAtIndex:aIdx withPointer:(__bridge void*)object];
-        } else
-            object = [self _resolveIndex:aIdx];
+    if(__builtin_expect(object != nil, 1))
+        return object;
+    else {
+        [self _resolveIndexes:[NSIndexSet indexSetWithIndex:aIdx]];
+        return (id)[_array pointerAtIndex:aIdx];
     }
-    return object;
 }
 - (id)objectAtIndexedSubscript:(NSUInteger const)aIdx
 {
     return [self objectAtIndex:aIdx];
 }
-- (NSArray *)objectsInRange:(NSRange const)aRange
-{
-    NSMutableArray * const array = [NSMutableArray new];
-    for(NSUInteger i = aRange.location; i < NSMaxRange(aRange); ++i) {
-        [array addObject:self[i]];
-    }
-    return array;
-}
 - (NSArray *)objectsAtIndexes:(NSIndexSet * const)aIndexes
 {
-    NSMutableArray * const array = [NSMutableArray new];
+    if(![_resolvedIndexes containsIndexes:aIndexes])
+        [self _resolveIndexes:aIndexes];
+
+    NSMutableArray * const array = [NSMutableArray arrayWithCapacity:[aIndexes count]];
     [aIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         [array addObject:self[idx]];
     }];
     return array;
+}
+- (NSArray *)objectsInRange:(NSRange const)aRange
+{
+    return [self objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:aRange]];
 }
 
 - (NSUInteger)count
@@ -87,19 +86,16 @@
     [_resolvedIndexes removeIndex:aIdx];
     [_array replacePointerAtIndex:aIdx withPointer:NULL];
 }
-- (void)forgetObjectsInRange:(NSRange const)aRange
-{
-    [_resolvedIndexes removeIndexesInRange:aRange];
-    for(NSUInteger i = aRange.location; i < NSMaxRange(aRange); ++i) {
-        [_array replacePointerAtIndex:i withPointer:NULL];
-    }
-}
 - (void)forgetObjectsAtIndexes:(NSIndexSet * const)aIndexes
 {
     [_resolvedIndexes removeIndexes:aIndexes];
     [aIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         [_array replacePointerAtIndex:idx withPointer:NULL];
     }];
+}
+- (void)forgetObjectsInRange:(NSRange const)aRange
+{
+    [self forgetObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:aRange]];
 }
 
 - (void)forgetAllObjects
