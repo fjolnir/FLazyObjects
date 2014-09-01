@@ -5,6 +5,7 @@ typedef void (^FLazyArrayResolver)(NSIndexSet *aIndexes, __strong id *aoObjects)
 
 // Warning: In no way thread safe. (Nor are any derived collections)
 @interface FLazyArray : NSObject
+@property(nonatomic, readonly, copy) NSIndexSet *resolvedIndexes;
 @property(nonatomic, readonly) NSUInteger count;
 @property(nonatomic) NSUInteger batchSize;
 

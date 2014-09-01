@@ -140,6 +140,10 @@
     }];
 }
 
+- (NSIndexSet *)resolvedIndexes
+{
+    return [_resolvedIndexes copy];
+}
 
 - (NSString *)description
 {
