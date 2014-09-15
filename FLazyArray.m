@@ -10,7 +10,6 @@
 @end
 
 @implementation FLazyArray
-@dynamic count;
 
 + (instancetype)lazyArrayWithCount:(NSUInteger const)aCount resolver:(FLazyArrayResolver const)aResolver
 {
