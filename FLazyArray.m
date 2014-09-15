@@ -2,6 +2,7 @@
 #import <objc/runtime.h>
 
 @interface FLazyArray () {
+    @protected
     FLazyArrayResolver _resolver;
     NSPointerArray *_array;
     NSMutableIndexSet *_resolvedIndexes;
@@ -11,7 +12,7 @@
 @implementation FLazyArray
 @dynamic count;
 
-+ (instancetype)arrayWithCount:(NSUInteger const)aCount resolver:(FLazyArrayResolver const)aResolver
++ (instancetype)lazyArrayWithCount:(NSUInteger const)aCount resolver:(FLazyArrayResolver const)aResolver
 {
     FLazyArray * const array = [self new];
     array->_resolver    = aResolver;
@@ -119,6 +120,27 @@
     _array.count = count;
 }
 
+- (NSIndexSet *)resolvedIndexes
+{
+    return [_resolvedIndexes copy];
+}
+
+- (NSString *)description
+{
+    NSMutableString * const desc = [NSMutableString stringWithFormat:@"<%@: %p\n", [self class], self];
+    for(NSUInteger i = 0; i < [_array count]; ++i) {
+        [desc appendFormat:@"    %@,\n", [_resolvedIndexes containsIndex:i] 
+                                         ? (id)[_array pointerAtIndex:i] 
+                                         : @"(unresolved)"];
+    }
+    [desc appendString:@">"];
+    return desc;
+}
+
+@end
+
+@implementation FMutableLazyArray
+
 - (void)insertObjectAtIndex:(NSUInteger const)aIdx
 {
     [_resolvedIndexes shiftIndexesStartingAtIndex:aIdx by:1];
@@ -140,22 +162,4 @@
     }];
 }
 
-- (NSIndexSet *)resolvedIndexes
-{
-    return [_resolvedIndexes copy];
-}
-
-- (NSString *)description
-{
-    NSMutableString * const desc = [NSMutableString stringWithFormat:@"<%@: %p\n", [self class], self];
-    for(NSUInteger i = 0; i < [_array count]; ++i) {
-        [desc appendFormat:@"    %@,\n", [_resolvedIndexes containsIndex:i] 
-                                         ? (id)[_array pointerAtIndex:i] 
-                                         : @"(unresolved)"];
-    }
-    [desc appendString:@">"];
-    return desc;
-}
-
 @end
-
