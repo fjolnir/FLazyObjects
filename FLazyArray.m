@@ -53,6 +53,7 @@
 
     __block __strong id *head = newlyResolved;
     [unresolvedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        NSAssert(*head, @"Object resolved to nil!");
         [_array replacePointerAtIndex:idx withPointer:(__bridge void *)*head++];
     }];
     [_resolvedIndexes addIndexes:unresolvedIndexes];
