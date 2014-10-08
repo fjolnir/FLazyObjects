@@ -36,10 +36,19 @@
         [aIndexes enumerateIndexesWithOptions:NSEnumerationReverse
                                    usingBlock:^(NSUInteger idx, BOOL *stop) {
             [(id)indexes addIndexesInRange:NSIntersectionRange(validRange,
-                                                               (NSRange) { idx, _batchSize - [indexes count] })];
+                                                               (NSRange) { idx, _batchSize - [indexes count] + 1})];
             if([indexes count] >= _batchSize)
                 *stop = YES;
         }];
+
+        if([indexes count] < _batchSize && [aIndexes firstIndex] > 0) {
+            NSUInteger const firstIndex = [aIndexes firstIndex];
+            NSUInteger const remaining = _batchSize - [indexes count];
+            [(id)indexes addIndexesInRange:(NSRange) {
+                firstIndex > remaining ? firstIndex - remaining : 0,
+                MIN([self count], remaining)
+            }];
+        }
     }
 
     NSIndexSet * const unresolvedIndexes = [indexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *_) {
