@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-typedef id (^FLazyProxyResolver)();
+typedef id (^FLazyProxyResolver)(void);
 
 @interface FLazyProxy : NSProxy
 + (instancetype)proxyWithBlock:(FLazyProxyResolver)aResolver;
